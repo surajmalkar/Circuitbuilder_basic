@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circuit Builder with Simple Wires</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 200px;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .component {
+            background-color: #444;
+            border: 1px solid #555;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: move;
+        }
+        .workspace {
+            flex-grow: 1;
+            padding: 20px;
+            position: relative;
+            background-color: #fff;
+            overflow: auto;
+        }
+        .reference {
+            width: 300px;
+            background-color: #e0e0e0;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .reference-circuit {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .reference-circuit svg {
+            max-width: 100%;
+            height: auto;
+        }
+        .draggable {
+            position: absolute;
+            cursor: move;
+            width: 60px;
+            height: 60px;
+        }
+        .draggable svg {
+            width: 100%;
+            height: 100%;
+        }
+        .wire {
+            position: absolute;
+            background-color: #000;
+            height: 2px;
+            width: 60px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Components</h2>
+            <div class="component" draggable="true" data-type="resistor">Resistor</div>
+            <div class="component" draggable="true" data-type="capacitor">Capacitor</div>
+            <div class="component" draggable="true" data-type="inductor">Inductor</div>
+            <div class="component" draggable="true" data-type="diode">Diode</div>
+            <div class="component" draggable="true" data-type="transistor">Transistor</div>
+            <div class="component" draggable="true" data-type="switch">Switch</div>
+            <div class="component" draggable="true" data-type="led">LED</div>
+            <div class="component" draggable="true" data-type="battery">Battery</div>
+            <div class="component" draggable="true" data-type="wire">Wire</div>
+        </div>
+        <div class="workspace" id="workspace">
+            <!-- Components will be added here dynamically -->
+        </div>
+        <div class="reference">
+            <h2>Reference Circuits</h2>
+            <div class="reference-circuit">
+                <h3>Simple LED Circuit</h3>
+                <svg width="250" height="150" viewBox="0 0 250 150">
+                    <line x1="20" y1="75" x2="230" y2="75" stroke="black" stroke-width="2"/>
+                    <line x1="40" y1="55" x2="40" y2="95" stroke="black" stroke-width="2"/>
+                    <line x1="50" y1="55" x2="50" y2="95" stroke="black" stroke-width="4"/>
+                    <text x="45" y="115" text-anchor="middle" font-size="12">Battery</text>
+                    <line x1="100" y1="55" x2="100" y2="95" stroke="black" stroke-width="2"/>
+                    <path d="M100,55 L120,55 L120,95 L140,95 L140,55 L160,55" fill="none" stroke="black" stroke-width="2"/>
+                    <text x="130" y="115" text-anchor="middle" font-size="12">Resistor</text>
+                    <path d="M190,55 L190,95 M190,75 L210,55 L210,95" fill="none" stroke="black" stroke-width="2"/>
+                    <circle cx="210" cy="55" r="5" fill="none" stroke="black" stroke-width="2"/>
+                    <text x="200" y="115" text-anchor="middle" font-size="12">LED</text>
+                </svg>
+                <p>A basic circuit with a battery, resistor, and LED in series.</p>
+            </div>
+            <div class="reference-circuit">
+                <h3>RC Low-Pass Filter</h3>
+                <svg width="250" height="150" viewBox="0 0 250 150">
+                    <line x1="20" y1="75" x2="230" y2="75" stroke="black" stroke-width="2"/>
+                    <line x1="40" y1="55" x2="40" y2="95" stroke="black" stroke-width="2"/>
+                    <path d="M40,55 L60,55 L60,95 L80,95 L80,55 L100,55" fill="none" stroke="black" stroke-width="2"/>
+                    <text x="70" y="115" text-anchor="middle" font-size="12">Resistor</text>
+                    <line x1="140" y1="35" x2="140" y2="115" stroke="black" stroke-width="2"/>
+                    <line x1="120" y1="35" x2="160" y2="35" stroke="black" stroke-width="2"/>
+                    <line x1="120" y1="45" x2="160" y2="45" stroke="black" stroke-width="2"/>
+                    <text x="140" y="130" text-anchor="middle" font-size="12">Capacitor</text>
+                    <text x="200" y="90" text-anchor="middle" font-size="12">Output</text>
+                </svg>
+                <p>A resistor-capacitor circuit used to filter high-frequency signals.</p>
+            </div>
+            <div class="reference-circuit">
+                <h3>Common Emitter Amplifier</h3>
+                <svg width="250" height="150" viewBox="0 0 250 150">
+                    <line x1="20" y1="75" x2="230" y2="75" stroke="black" stroke-width="2"/>
+                    <circle cx="125" cy="75" r="30" fill="none" stroke="black" stroke-width="2"/>
+                    <line x1="95" y1="75" x2="155" y2="75" stroke="black" stroke-width="2"/>
+                    <line x1="125" y1="45" x2="125" y2="105" stroke="black" stroke-width="2"/>
+                    <path d="M125,60 L145,90 M145,90 L105,90" fill="none" stroke="black" stroke-width="2"/>
+                    <text x="125" y="140" text-anchor="middle" font-size="12">Transistor</text>
+                    <path d="M40,55 L60,55 L60,95 L80,95 L80,55 L100,55" fill="none" stroke="black" stroke-width="2"/>
+                    <text x="70" y="115" text-anchor="middle" font-size="12">Resistor</text>
+                    <path d="M180,55 L200,55 L200,95 L220,95 L220,55 L240,55" fill="none" stroke="black" stroke-width="2"/>
+                    <text x="210" y="115" text-anchor="middle" font-size="12">Resistor</text>
+                </svg>
+                <p>A basic transistor amplifier configuration.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const workspace = document.getElementById('workspace');
+        let draggedElement = null;
+
+        // Add event listeners to components
+        document.querySelectorAll('.component').forEach(component => {
+            component.addEventListener('dragstart', dragStart);
+        });
+
+        // Add event listeners to workspace
+        workspace.addEventListener('dragover', dragOver);
+        workspace.addEventListener('drop', drop);
+
+        function dragStart(e) {
+            draggedElement = e.target;
+        }
+
+        function dragOver(e) {
+            e.preventDefault();
+        }
+
+        function drop(e) {
+            e.preventDefault();
+            if (draggedElement) {
+                const componentType = draggedElement.getAttribute('data-type');
+                const newComponent = document.createElement('div');
+                newComponent.className = `draggable ${componentType}`;
+                newComponent.style.left = `${e.clientX - workspace.offsetLeft + workspace.scrollLeft}px`;
+                newComponent.style.top = `${e.clientY - workspace.offsetTop + workspace.scrollTop}px`;
+                
+                // Add SVG representation of the component
+                newComponent.innerHTML = getComponentSVG(componentType);
+                
+                // Make the new component draggable within the workspace
+                newComponent.addEventListener('mousedown', startDrag);
+                
+                workspace.appendChild(newComponent);
+            }
+        }
+
+        function startDrag(e) {
+            const element = e.target.closest('.draggable');
+            if (!element) return;
+            
+            let startX = e.clientX - element.offsetLeft;
+            let startY = e.clientY - element.offsetTop;
+
+            function moveElement(e) {
+                element.style.left = `${e.clientX - startX + workspace.scrollLeft}px`;
+                element.style.top = `${e.clientY - startY + workspace.scrollTop}px`;
+            }
+
+            function stopDrag() {
+                document.removeEventListener('mousemove', moveElement);
+                document.removeEventListener('mouseup', stopDrag);
+            }
+
+            document.addEventListener('mousemove', moveElement);
+            document.addEventListener('mouseup', stopDrag);
+        }
+
+        function getComponentSVG(type) {
+            switch (type) {
+                case 'resistor':
+                    return '<svg viewBox="0 0 60 60"><path d="M0,30 H15 L20,20 L30,40 L40,20 L50,40 L55,30 H60" stroke="black" stroke-width="2" fill="none"/></svg>';
+                case 'capacitor':
+                    return '<svg viewBox="0 0 60 60"><line x1="0" y1="30" x2="25" y2="30" stroke="black" stroke-width="2"/><line x1="25" y1="10" x2="25" y2="50" stroke="black" stroke-width="2"/><line x1="35" y1="10" x2="35" y2="50" stroke="black" stroke-width="2"/><line x1="35" y1="30" x2="60" y2="30" stroke="black" stroke-width="2"/></svg>';
+                case 'inductor':
+                    return '<svg viewBox="0 0 60 60"><path d="M0,30 Q15,30 15,15 Q15,0 30,0 Q45,0 45,15 Q45,30 60,30" stroke="black" stroke-width="2" fill="none"/></svg>';
+                case 'diode':
+                    return '<svg viewBox="0 0 60 60"><line x1="0" y1="30" x2="20" y2="30" stroke="black" stroke-width="2"/><line x1="40" y1="30" x2="60" y2="30" stroke="black" stroke-width="2"/><polygon points="20,10 20,50 40,30" stroke="black" stroke-width="2" fill="none"/><line x1="40" y1="10" x2="40" y2="50" stroke="black" stroke-width="2"/></svg>';
+                case 'transistor':
+                    return '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="20" stroke="black" stroke-width="2" fill="none"/><line x1="10" y1="30" x2="50" y2="30" stroke="black" stroke-width="2"/><line x1="30" y1="10" x2="30" y2="50" stroke="black" stroke-width="2"/><path d="M30,20 L40,40 M40,40 L20,40" fill="none" stroke="black" stroke-width="2"/></svg>';
+                case 'switch':
+                    return '<svg viewBox="0 0 60 60"><circle cx="10" cy="30" r="5" stroke="black" stroke-width="2" fill="white"/><line x1="10" y1="30" x2="50" y2="10" stroke="black" stroke-width="2"/><circle cx="50" cy="30" r="5" stroke="black" stroke-width="2" fill="white"/></svg>';
+                case 'led':
+                    return '<svg viewBox="0 0 60 60"><path d="M20,10 L20,50 L40,30 Z" stroke="black" stroke-width="2" fill="none"/><line x1="40" y1="10" x2="40" y2="50" stroke="black" stroke-width="2"/><path d="M10,30 L20,30 M40,30 L50,30 M45,15 L55,5 M50,20 L60,10" stroke="black" stroke-width="2"/></svg>';
+                case 'battery':
+                    return '<svg viewBox="0 0 60 60"><line x1="0" y1="30" x2="20" y2="30" stroke="black" stroke-width="2"/><line x1="20" y1="10" x2="20" y2="50" stroke="black" stroke-width="2"/><line x1="30" y1="20" x2="30" y2="40" stroke="black" stroke-width="4"/><line x1="40" y1="30" x2="60" y2="30" stroke="black" stroke-width="2"/></svg>';
+                case 'wire':
+                    return '<svg viewBox="0 0 60 60"><line x1="0" y1="30" x2="60" y2="30" stroke="black" stroke-width="2"/></svg>';
+                default:
+                    return '';
+            }
+        }
+    </script>
+</body>
+</html>
